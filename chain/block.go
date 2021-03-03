@@ -75,4 +75,23 @@ func CreateGenesisBlock(data []byte) Block {
 	return genesis
 }
 
+/**
+ *	实现blockInterface的方法
+ */
+func (block Block) GetHeight() int64 {
+	return block.Height
+}
+func (block Block) GetVersion() int64 {
+	return block.Versionn
+}
+func (block Block) GetTimeStamp() int64 {
+	return block.Timestamp
+}
+func (block Block) GetPreHash() [32]byte {
+	return block.PreHash
+}
+func (block Block) GetData() []byte {
+	return block.Data
+}
+
 

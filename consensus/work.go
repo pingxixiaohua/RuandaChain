@@ -1,7 +1,6 @@
-package pow
+package consensus
 
 import (
-	"RuandaChain/chain"
 	"RuandaChain/utils"
 	"bytes"
 	"crypto/sha256"
@@ -17,7 +16,7 @@ const DIFFICULTY = 10 //初始难度为10，即大整数的开头有10个零
  *	工作量证明
  */
 type ProofWork struct {
-	Block chain.Block
+	Block  BlockInterface
 	Target *big.Int
 }
 
@@ -55,12 +54,13 @@ func (work ProofWork) SearchNonce() ([32]byte,int64) {
 /**
  *	根据当前的区块和当前的nonce值，计算区块的hash值
  */
-func CalculateBlockHash(block chain.Block, nonce int64) [32]byte {
-	heightByte, _ := utils.Int2Byte(block.Height)
-	versionByte, _ := utils.Int2Byte(block.Versionn)
-	timeByte, _ := utils.Int2Byte(block.Timestamp)
+func CalculateBlockHash(block BlockInterface, nonce int64) [32]byte {
+	heightByte, _ := utils.Int2Byte(block.GetHeight())
+	versionByte, _ := utils.Int2Byte(block.GetVersion())
+	timeByte, _ := utils.Int2Byte(block.GetTimeStamp())
 	nonceByte, _ := utils.Int2Byte(nonce)
-	bk := bytes.Join([][]byte{heightByte,versionByte,block.PreHash[:],timeByte,nonceByte,block.Data}, []byte{})
+		preHash := block.GetPreHash()
+	bk := bytes.Join([][]byte{heightByte,versionByte,preHash[:],timeByte,nonceByte,block.GetData()}, []byte{})
 
 	return sha256.Sum256(bk)
 
