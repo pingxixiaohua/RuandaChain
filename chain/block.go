@@ -2,9 +2,6 @@ package chain
 
 import (
 	"RuandaChain/consensus"
-	"RuandaChain/utils"
-	"bytes"
-	"crypto/sha256"
 	"time"
 )
 
@@ -27,15 +24,15 @@ type Block struct {
 /**
  *	该方法用于计算区块的hash值
  */
-func (block *Block) SetHash()  {
-	heightByte, _ := utils.Int2Byte(block.Height)
-	versionByte, _ := utils.Int2Byte(block.Versionn)
-	timeByte, _ := utils.Int2Byte(block.Timestamp)
-	nonceByte, _ := utils.Int2Byte(block.Nonce)
-	bk := bytes.Join([][]byte{heightByte,versionByte,block.PreHash[:],timeByte,nonceByte,block.Data}, []byte{})
-	hash := sha256.Sum256(bk)
-	block.Hash = hash
-}
+//func (block *Block) SetHash()  {
+//	heightByte, _ := utils.Int2Byte(block.Height)
+//	versionByte, _ := utils.Int2Byte(block.Versionn)
+//	timeByte, _ := utils.Int2Byte(block.Timestamp)
+//	nonceByte, _ := utils.Int2Byte(block.Nonce)
+//	bk := bytes.Join([][]byte{heightByte,versionByte,block.PreHash[:],timeByte,nonceByte,block.Data}, []byte{})
+//	hash := sha256.Sum256(bk)
+//	block.Hash = hash
+//}
 
 /**
  *	创建一个新的数据区块函数
@@ -47,12 +44,15 @@ func CreateBlock(height int64, prevHash [32]byte, data []byte) Block {
 	block.Versionn = VERSION
 	block.Timestamp = time.Now().Unix()
 	block.Data = data
-	block.SetHash()//计算hash
 
 	//给nonce值赋值
 	//共识机制PoW、PoS
-	cons := consensus.NewPoS()
-	cons.Run()
+	//确定选用PoW实现共识机制
+
+	proof := consensus.NewProofWork(block)
+	hash, nonce := proof.SearchNonce()
+	block.Nonce = nonce
+	block.Hash = hash
 
 	return block
 }
@@ -67,6 +67,12 @@ func CreateGenesisBlock(data []byte) Block {
 	genesis.Versionn = VERSION
 	genesis.Timestamp = time.Now().Unix()
 	genesis.Data = data
-	genesis.SetHash()//计算hash值
+	proof := consensus.NewProofWork(genesis)
+	hash, nonce := proof.SearchNonce()
+	genesis.Hash = hash
+	genesis.Nonce = nonce
+
 	return genesis
 }
+
+
