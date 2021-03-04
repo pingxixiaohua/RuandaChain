@@ -2,6 +2,8 @@ package chain
 
 import (
 	"RuandaChain/consensus"
+	"bytes"
+	"encoding/gob"
 	"time"
 )
 
@@ -33,6 +35,30 @@ type Block struct {
 //	hash := sha256.Sum256(bk)
 //	block.Hash = hash
 //}
+
+/**
+ *	区块的序列化，序列化为[]byte数据类型
+ */
+func (block *Block) Serialize() ([]byte, error) {
+	buff := new(bytes.Buffer)
+	encoder := gob.NewEncoder(buff)
+	err := encoder.Encode(&block)
+
+	return buff.Bytes(),err
+}
+
+/**
+ *	区块的反序列化操作，传入[]byte，返回Block结构体或者error
+ */
+func Deserialize(data []byte) (Block, error) {
+	var block Block
+	//reader := new(bytes.Reader)
+	//reader.Read(data)
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&block)
+
+	return block, err
+}
 
 /**
  *	创建一个新的数据区块函数

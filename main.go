@@ -16,7 +16,17 @@ func main() {
 	blockchain.AdddNewBlock([]byte("block1"))
 	blockchain.AdddNewBlock([]byte("block2"))
 	fmt.Println("当前共有区块个数：",len(blockchain.Blocks))
-	fmt.Println(blockchain.Blocks[0])
-	fmt.Println(blockchain.Blocks[1])
-	fmt.Println(blockchain.Blocks[2])
+	block0 := blockchain.Blocks[0]
+	block0SerBytes, err := block0.Serialize()
+	if err != nil {
+		fmt.Println("序列化区块0出现错误")
+		return
+	}
+	deBlock0, err := chain.Deserialize(block0SerBytes)
+	if err != nil {
+		fmt.Println("反序列化区块0出现错误，程序已停止")
+		return
+	}
+
+	//fmt.Println(string((deBlock0)))
 }
