@@ -3,30 +3,48 @@ package main
 import (
 	"RuandaChain/chain"
 	"fmt"
+	"github.com/bolt-master"
 )
+
+const DBFILE  = "ruanda.db"
 
 /**
  *	项目的主入口
  */
 func main() {
+
 	fmt.Println("hello world")
 
-	blockchain := chain.CreateChainWithGenesis([]byte("Hello World"))
-
-	blockchain.AdddNewBlock([]byte("block1"))
-	blockchain.AdddNewBlock([]byte("block2"))
-	fmt.Println("当前共有区块个数：",len(blockchain.Blocks))
-	block0 := blockchain.Blocks[0]
-	block0SerBytes, err := block0.Serialize()
+	engine, err := bolt.Open(DBFILE, 0600,nil)
 	if err != nil {
-		fmt.Println("序列化区块0出现错误")
-		return
+		panic(err.Error())
 	}
-	deBlock0, err := chain.Deserialize(block0SerBytes)
+
+	blockChain := chain.NewBlockChain(engine)
+	//创世区块
+	blockChain.CreateGenesis([]byte("hello world"))
+	//新增一个区块
+	err = blockChain.AdddNewBlock([]byte("hello"))
 	if err != nil {
-		fmt.Println("反序列化区块0出现错误，程序已停止")
+		fmt.Println(err.Error())
 		return
 	}
 
-	//fmt.Println(string((deBlock0)))
+	//获取最新区块
+	//lastBlock, err := blockChain.GetLastBlock()
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//	return
+	//}
+	//fmt.Println(lastBlock)
+
+	allBlocks, err := blockChain.GetAllBlocks()
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	for _, block := range allBlocks{
+		fmt.Println(block)
+	}
 }
+
