@@ -84,7 +84,7 @@ func (chain *BlockChain) CreateGenesis(genesisData []byte)  {
 /**
  *	新增一个区块
  */
-func (chain *BlockChain) AdddNewBlock(data []byte) error {
+func (chain *BlockChain) AddNewBlock(data []byte) error {
 	//1、从db中找到最后一个区块
 	engine := chain.Engine
 	//2、获取到最新区块数据
